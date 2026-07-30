@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PizzaApp.Tests/PizzaApp.Tests.csproj" />
+  <Project Path="PizzaApp/PizzaApp.csproj" />
+</Solution>

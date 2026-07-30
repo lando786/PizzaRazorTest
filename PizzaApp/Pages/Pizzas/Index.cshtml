@@ -1,0 +1,40 @@
+@page
+@model PizzaApp.Pages.Pizzas.IndexModel
+@{
+    ViewData["Title"] = "Pizzas";
+}
+
+<h1>Pizzas</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary" data-testid="add-pizza">Add New Pizza</a>
+</p>
+
+<table class="table" data-testid="pizza-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Price</th>
+            <th>Toppings</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pizza in Model.Pizzas)
+        {
+            <tr data-testid="pizza-row-@pizza.Id">
+                <td data-testid="pizza-name-@pizza.Id">@pizza.Name</td>
+                <td>@pizza.Description</td>
+                <td>@pizza.Size</td>
+                <td>@pizza.Price.ToString("C")</td>
+                <td>@string.Join(", ", pizza.Toppings)</td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@pizza.Id" class="btn btn-sm btn-secondary" data-testid="edit-pizza-@pizza.Id">Edit</a>
+                    <a asp-page="Delete" asp-route-id="@pizza.Id" class="btn btn-sm btn-danger" data-testid="delete-pizza-@pizza.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
