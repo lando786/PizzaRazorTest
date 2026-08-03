@@ -95,7 +95,7 @@ public sealed class PizzaCrudUiTests : SeleniumTestBase
                 element => element.Text == name);
         });
 
-    private async Task CreatePizzaAsync(
+    private Task CreatePizzaAsync(
         string name,
         string description,
         string price,
@@ -119,7 +119,7 @@ public sealed class PizzaCrudUiTests : SeleniumTestBase
         FindByTestId("save-pizza").Click();
         WaitForList();
         FindPizzaRow(name);
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private IWebElement FindPizzaRow(string name) =>

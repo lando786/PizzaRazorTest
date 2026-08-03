@@ -29,8 +29,25 @@ public abstract class SeleniumTestBase : IDisposable
 
     public void Dispose()
     {
-        Driver.Quit();
-        Driver.Dispose();
+        try
+        {
+            Driver.Quit();
+        }
+        catch (WebDriverException exception)
+        {
+            Console.Error.WriteLine($"Failed to quit the Selenium browser session: {exception.Message}");
+        }
+        finally
+        {
+            try
+            {
+                Driver.Dispose();
+            }
+            catch (WebDriverException exception)
+            {
+                Console.Error.WriteLine($"Failed to dispose the Selenium browser session: {exception.Message}");
+            }
+        }
     }
 
     protected IWebElement FindByTestId(string testId) =>

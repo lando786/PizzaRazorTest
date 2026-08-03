@@ -28,7 +28,6 @@ public sealed class PizzaAppFixture : IAsyncLifetime
         startInfo.ArgumentList.Add("run");
         startInfo.ArgumentList.Add("--project");
         startInfo.ArgumentList.Add("PizzaApp/PizzaApp.csproj");
-        startInfo.ArgumentList.Add("--no-build");
         startInfo.ArgumentList.Add("--urls");
         startInfo.ArgumentList.Add(BaseUri.ToString().TrimEnd('/'));
 
@@ -66,7 +65,7 @@ public sealed class PizzaAppFixture : IAsyncLifetime
             if (_applicationProcess?.HasExited == true)
             {
                 throw new InvalidOperationException(
-                    $"PizzaApp exited before it was ready.{Environment.NewLine}{_applicationOutput}");
+                    $"PizzaApp exited before it was ready.{Environment.NewLine}{GetApplicationOutput()}");
             }
 
             try
@@ -86,7 +85,7 @@ public sealed class PizzaAppFixture : IAsyncLifetime
         }
 
         throw new TimeoutException(
-            $"PizzaApp did not become ready at {BaseUri}.{Environment.NewLine}{_applicationOutput}",
+            $"PizzaApp did not become ready at {BaseUri}.{Environment.NewLine}{GetApplicationOutput()}",
             lastException);
     }
 
@@ -98,6 +97,14 @@ public sealed class PizzaAppFixture : IAsyncLifetime
             {
                 _applicationOutput.AppendLine(eventArgs.Data);
             }
+        }
+    }
+
+    private string GetApplicationOutput()
+    {
+        lock (_applicationOutput)
+        {
+            return _applicationOutput.ToString();
         }
     }
 
