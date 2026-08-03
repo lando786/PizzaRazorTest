@@ -41,6 +41,18 @@ The console output will print the URL to browse to (typically `https://localhost
 dotnet test PizzaApp.slnx
 ```
 
+## Run Selenium UI tests
+
+The browser suite starts PizzaApp as a local child process and drives the real Razor Pages UI with headless Google Chrome. Install Chrome and the .NET 10 SDK, then run:
+
+```
+dotnet test PizzaApp.UITests/PizzaApp.UITests.csproj
+```
+
+Selenium Manager obtains a compatible ChromeDriver automatically. Tests run serially because the in-memory pizza store is shared for the application's process lifetime. Each suite starts with the seeded data and uses unique test pizzas. On a failure, the browser screenshot, page source, current URL, and browser logs are written under the UI test output's `TestResults/selenium` directory.
+
+Use the existing `data-testid` attributes for future UI-test locators. The suite is headless and can be run by a future CI workflow using the same command.
+
 ## API endpoints
 
 The Razor Pages UI talks to these endpoints over real HTTP (useful if you want to hit them directly, e.g. to seed data for a UI test):
