@@ -39,6 +39,6 @@ body {
   margin-left: -50vw;
   margin-right: -50vw;
   padding: 2rem 1rem;
-  background-color: #258cfb;
-  color: #fff;
+  background-color: var(--bs-primary, #0d6efd);
+  color: var(--bs-white, #fff);
 }
