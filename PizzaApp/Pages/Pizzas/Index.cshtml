@@ -6,9 +6,11 @@
 
 <h1>Pizzas</h1>
 
-<p>
-    <a asp-page="Create" class="btn btn-primary" data-testid="add-pizza">Add New Pizza</a>
-</p>
+<feature name="PizzaManagement">
+    <p>
+        <a asp-page="Create" class="btn btn-primary" data-testid="add-pizza">Add New Pizza</a>
+    </p>
+</feature>
 
 <table class="table" data-testid="pizza-table">
     <thead>
@@ -18,7 +20,9 @@
             <th>Size</th>
             <th>Price</th>
             <th>Toppings</th>
-            <th></th>
+            <feature name="PizzaManagement">
+                <th></th>
+            </feature>
         </tr>
     </thead>
     <tbody>
@@ -30,10 +34,12 @@
                 <td>@pizza.Size</td>
                 <td>@pizza.Price.ToString("C")</td>
                 <td>@string.Join(", ", pizza.Toppings)</td>
-                <td>
-                    <a asp-page="Edit" asp-route-id="@pizza.Id" class="btn btn-sm btn-secondary" data-testid="edit-pizza-@pizza.Id">Edit</a>
-                    <a asp-page="Delete" asp-route-id="@pizza.Id" class="btn btn-sm btn-danger" data-testid="delete-pizza-@pizza.Id">Delete</a>
-                </td>
+                <feature name="PizzaManagement">
+                    <td>
+                        <a asp-page="Edit" asp-route-id="@pizza.Id" class="btn btn-sm btn-secondary" data-testid="edit-pizza-@pizza.Id">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@pizza.Id" class="btn btn-sm btn-danger" data-testid="delete-pizza-@pizza.Id">Delete</a>
+                    </td>
+                </feature>
             </tr>
         }
     </tbody>

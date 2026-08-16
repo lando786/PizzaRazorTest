@@ -1,17 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement.Mvc;
 using PizzaApp.Models;
 using PizzaApp.Services;
 
 namespace PizzaApp.Pages.Pizzas;
 
+[FeatureGate(FeatureFlags.PizzaManagement)]
 public class EditModel : PageModel
 {
     private readonly PizzaApiClient _pizzaApiClient;
+    private readonly IOptionsSnapshot<PizzaOrderingOptions> _orderingOptions;
 
-    public EditModel(PizzaApiClient pizzaApiClient)
+    public EditModel(
+        PizzaApiClient pizzaApiClient,
+        IOptionsSnapshot<PizzaOrderingOptions> orderingOptions)
     {
         _pizzaApiClient = pizzaApiClient;
+        _orderingOptions = orderingOptions;
     }
 
     [BindProperty]
@@ -21,6 +28,8 @@ public class EditModel : PageModel
     public List<string> SelectedToppings { get; set; } = [];
 
     public IReadOnlyList<string> AvailableToppings => ToppingOptions.All;
+
+    public int MaximumToppings => _orderingOptions.Value.MaximumToppings;
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -37,7 +46,7 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(int id)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || !HasValidToppingCount())
         {
             return Page();
         }
@@ -50,5 +59,18 @@ public class EditModel : PageModel
         }
 
         return RedirectToPage("Index");
+    }
+
+    private bool HasValidToppingCount()
+    {
+        if (SelectedToppings.Count <= MaximumToppings)
+        {
+            return true;
+        }
+
+        ModelState.AddModelError(
+            nameof(SelectedToppings),
+            $"Select no more than {MaximumToppings} toppings.");
+        return false;
     }
 }

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.FeatureManagement.Mvc;
 using PizzaApp.Models;
 using PizzaApp.Services;
 
 namespace PizzaApp.Pages.Pizzas;
 
+[FeatureGate(FeatureFlags.PizzaManagement)]
 public class DeleteModel : PageModel
 {
     private readonly PizzaApiClient _pizzaApiClient;
