@@ -6,7 +6,7 @@
 
 <h1>Pizzas</h1>
 
-<feature name="PizzaManagement">
+<feature name="@FeatureFlags.PizzaManagement">
     <p>
         <a asp-page="Create" class="btn btn-primary" data-testid="add-pizza">Add New Pizza</a>
     </p>
@@ -20,7 +20,7 @@
             <th>Size</th>
             <th>Price</th>
             <th>Toppings</th>
-            <feature name="PizzaManagement">
+            <feature name="@FeatureFlags.PizzaManagement">
                 <th></th>
             </feature>
         </tr>
@@ -34,7 +34,7 @@
                 <td>@pizza.Size</td>
                 <td>@pizza.Price.ToString("C")</td>
                 <td>@string.Join(", ", pizza.Toppings)</td>
-                <feature name="PizzaManagement">
+                <feature name="@FeatureFlags.PizzaManagement">
                     <td>
                         <a asp-page="Edit" asp-route-id="@pizza.Id" class="btn btn-sm btn-secondary" data-testid="edit-pizza-@pizza.Id">Edit</a>
                         <a asp-page="Delete" asp-route-id="@pizza.Id" class="btn btn-sm btn-danger" data-testid="delete-pizza-@pizza.Id">Delete</a>

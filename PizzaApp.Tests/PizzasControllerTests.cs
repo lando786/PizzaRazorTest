@@ -122,6 +122,18 @@ public class PizzasControllerTests : IClassFixture<WebApplicationFactory<Program
     }
 
     [Fact]
+    public async Task Update_ReturnsBadRequest_WhenPizzaExceedsConfiguredToppingLimit()
+    {
+        var pizza = await CreatePizzaAsync();
+        pizza.Toppings = ["Pepperoni", "Mushroom", "Onion", "Sausage", "Bacon"];
+
+        var response = await _client.PutAsJsonAsync($"/api/pizzas/{pizza.Id}", pizza);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("no more than 4 toppings", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
     public async Task WriteOperations_ReturnNotFound_WhenPizzaManagementIsDisabled()
     {
         using var disabledFactory = _factory.WithWebHostBuilder(builder =>
@@ -139,6 +151,10 @@ public class PizzasControllerTests : IClassFixture<WebApplicationFactory<Program
         });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            (await disabledClient.PutAsJsonAsync("/api/pizzas/1", new Pizza { Name = "Disabled Feature" })).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await disabledClient.DeleteAsync("/api/pizzas/1")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await disabledClient.GetAsync("/Pizzas/Create")).StatusCode);
     }
 

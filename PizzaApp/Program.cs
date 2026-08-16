@@ -8,6 +8,7 @@ using PizzaApp.Services;
 var builder = WebApplication.CreateBuilder(args);
 var appConfigurationEndpoint = builder.Configuration["AppConfiguration:Endpoint"];
 var useAppConfiguration = !string.IsNullOrWhiteSpace(appConfigurationEndpoint);
+var refreshInterval = TimeSpan.FromSeconds(30);
 
 if (useAppConfiguration)
 {
@@ -22,13 +23,13 @@ if (useAppConfiguration)
             .Select("PizzaApp:*", LabelFilter.Null)
             .Select("PizzaApp:*", builder.Environment.EnvironmentName)
             .ConfigureRefresh(refreshOptions =>
-                refreshOptions.RegisterAll().SetRefreshInterval(TimeSpan.FromSeconds(30)));
+                refreshOptions.RegisterAll().SetRefreshInterval(refreshInterval));
 
         options.UseFeatureFlags(featureFlagOptions =>
         {
             featureFlagOptions.Select(FeatureFlags.PizzaManagement, LabelFilter.Null);
             featureFlagOptions.Select(FeatureFlags.PizzaManagement, builder.Environment.EnvironmentName);
-            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(30));
+            featureFlagOptions.SetRefreshInterval(refreshInterval);
         });
     });
 }
