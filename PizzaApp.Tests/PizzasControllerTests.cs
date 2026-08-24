@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using PizzaApp.Models;
 using Xunit;
 
@@ -9,9 +11,11 @@ namespace PizzaApp.Tests;
 public class PizzasControllerTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
+    private readonly WebApplicationFactory<Program> _factory;
 
     public PizzasControllerTests(WebApplicationFactory<Program> factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -101,6 +105,57 @@ public class PizzasControllerTests : IClassFixture<WebApplicationFactory<Program
         var response = await _client.DeleteAsync("/api/pizzas/999999");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsBadRequest_WhenPizzaExceedsConfiguredToppingLimit()
+    {
+        var response = await _client.PostAsJsonAsync("/api/pizzas", new Pizza
+        {
+            Name = "Too Many Toppings",
+            Price = 10.00m,
+            Toppings = ["Pepperoni", "Mushroom", "Onion", "Sausage", "Bacon"]
+        });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("no more than 4 toppings", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Update_ReturnsBadRequest_WhenPizzaExceedsConfiguredToppingLimit()
+    {
+        var pizza = await CreatePizzaAsync();
+        pizza.Toppings = ["Pepperoni", "Mushroom", "Onion", "Sausage", "Bacon"];
+
+        var response = await _client.PutAsJsonAsync($"/api/pizzas/{pizza.Id}", pizza);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("no more than 4 toppings", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task WriteOperations_ReturnNotFound_WhenPizzaManagementIsDisabled()
+    {
+        using var disabledFactory = _factory.WithWebHostBuilder(builder =>
+            builder.ConfigureAppConfiguration((_, configuration) =>
+                configuration.AddInMemoryCollection(
+                [
+                    new KeyValuePair<string, string?>("FeatureManagement:PizzaManagement", "false")
+                ])));
+        using var disabledClient = disabledFactory.CreateClient();
+
+        var response = await disabledClient.PostAsJsonAsync("/api/pizzas", new Pizza
+        {
+            Name = "Disabled Feature",
+            Price = 10.00m
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            (await disabledClient.PutAsJsonAsync("/api/pizzas/1", new Pizza { Name = "Disabled Feature" })).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await disabledClient.DeleteAsync("/api/pizzas/1")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await disabledClient.GetAsync("/Pizzas/Create")).StatusCode);
     }
 
     private async Task<Pizza> CreatePizzaAsync()

@@ -34,6 +34,8 @@
 
     <div class="mb-3">
         <label class="form-label">Toppings</label>
+        <p class="form-text" data-testid="maximum-toppings">Choose up to @Model.MaximumToppings toppings.</p>
+        <span asp-validation-for="SelectedToppings" class="text-danger"></span>
         <div>
             @foreach (var topping in Model.AvailableToppings)
             {

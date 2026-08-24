@@ -75,3 +75,9 @@ Data resets to the seeded sample pizzas every time the app restarts.
 ## Notes for UI testing
 
 Key elements carry `data-testid` attributes (e.g. `pizza-row-{id}`, `edit-pizza-{id}`, `delete-pizza-{id}`, `pizza-name`, `save-pizza`, `confirm-delete`) for stable test locators.
+
+## Azure App Configuration
+
+PizzaApp can load the `PizzaApp:*` configuration prefix and the `PizzaManagement` feature flag from Azure App Configuration. It uses `DefaultAzureCredential`: Azure CLI/IDE credentials locally and the App Service managed identity after deployment. It loads unlabeled values first, then values labeled with the current ASP.NET Core environment name (`Development` or `Production`), and checks for updates at most every 30 seconds while requests are arriving.
+
+Without `AppConfiguration:Endpoint`, the checked-in local defaults remain active so the app and tests run without Azure credentials. See [Azure App Configuration setup](docs/azure-app-configuration-setup.md) for the required Azure portal steps and local setup.
